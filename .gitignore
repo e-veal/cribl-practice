@@ -3,3 +3,4 @@ certs/
 *.mp4
 minio-data
 grafana-data
+credentials.json
