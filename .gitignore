@@ -1,0 +1,5 @@
+certs/
+.DS_Store
+*.mp4
+minio-data
+grafana-data
