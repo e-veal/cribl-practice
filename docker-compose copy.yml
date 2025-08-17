@@ -1,0 +1,178 @@
+#####################################################
+#                Build Cribl Environment            #
+#####################################################
+# docker-compose up -d --scale workers=1 --scale edge=1 --scale edge-emea=1 --scale edge-apac=1 --scale edge-amer=1
+# cribl default user: admin; password: admin --> changed: CriblAdmin123
+# kibana default user: elastic; password: Sup3rS3cure#2
+# grafana user: admin; password: Sup3rS3cure#2
+# keycloak user: keycloakadmin; password: Sup3rS3cure#2
+# minio default user: minioadmin; password: minioadmin
+# minion Access Key: b6XwDnHQ95VB4ypmmNBI; Secret Key: rlWOOE73zcl6vTTZeMVlgT0Hp7HXlyFIrteVwGXO
+# list container ids and names: docker ps --format "table {{.ID}}\t{{.Names}}"
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=keycloakadmin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=Sup3rS3cure#2
+    command: start-dev
+    volumes:
+      - "~/Downloads/cribl-practice/configs/keycloak-data:/opt/keycloak/data"
+    restart: always
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1
+    command: server --console-address ":9090" /minio/mnt/data
+    ports:
+      - "9001:9000"
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://minio:9090/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    hostname: minio
+    volumes:
+      - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
+      - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
+  stream:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    environment:
+      - CRIBL_DIST_MODE=master
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@0.0.0.0:4200
+      - CRIBL_VOLUME_DIR=/opt/cribl/config-volume
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+      - VIRTUAL_HOST=localhost
+    ports:
+      - "19000:9000"
+    volumes:
+      - "~/Downloads/cribl-practice/configs/cribl-config:/opt/cribl/config-volume"
+    cap_add:
+      - CAP_NET_BIND_SERVICE
+      - CAP_DAC_READ_SEARCH
+      - CAP_SYS_PTRACE
+  workers:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    depends_on: 
+      - stream
+    environment:
+      - CRIBL_DIST_MODE=worker
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200
+      - CRIBL_VOLUME_DIR=/opt/cribl/worker-config
+    volumes:
+      - "~/Downloads/cribl-practice/configs/cribl-data:/opt/cribl/worker-volume"
+    ports:
+      - "9000"
+
+  edge:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    depends_on: 
+      - stream
+    environment:
+      - CRIBL_DIST_MODE=managed-edge
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=default_fleet
+      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
+    volumes:
+      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
+    ports:
+      - "9420"
+
+  edge-amer:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    depends_on: 
+      - stream
+    environment:
+      - CRIBL_DIST_MODE=managed-edge
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=AMER
+      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
+    volumes:
+      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
+    ports:
+      - "9420"
+
+  edge-emea:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    depends_on: 
+      - stream
+    environment:
+      - CRIBL_DIST_MODE=managed-edge
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=EMEA
+      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
+    volumes:
+      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
+    ports:
+      - "9420"
+
+  edge-apac:
+    build: .
+    user: cribl:cribl
+    restart: unless-stopped
+    depends_on: 
+      - stream
+    environment:
+      - CRIBL_DIST_MODE=managed-edge
+      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=APAC
+      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
+    volumes:
+      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
+    ports:
+      - "9420"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=Sup3rS3cure#2
+    volumes:
+      - "~/Downloads/cribl-practice/configs/elastic-config:/opt/elasticsearch/etc/"
+    ports:
+      - "9200:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: always
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.1.2
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    restart: always
+
+## Look in the Kibana logs for http://0.0.0.0:5601/?code=######
+## Should appear after 20 secs
+## On the Elasticsearch container, run: 
+## /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+## Copy the enrollment key to Kibana 
+## Look in the Kibana logs to get the verification code
+
+  grafana:
+    image: grafana/grafana-oss
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"
+
+  prometheus:
+    image: prom/prometheus
+    restart: unless-stopped
+    ports:
+      - '9080:9080'
+    volumes:
+      - "~/Downloads/cribl-practice/configs/prom-data:/etc/prometheus"

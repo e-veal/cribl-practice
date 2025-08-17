@@ -1,16 +1,29 @@
 #####################################################
 #                Build Cribl Environment            #
 #####################################################
-# docker-compose up -d --scale workers=1 --scale edge=1 --scale edge-emea=1 --scale edge-apac=1 --scale edge-amer=1
-# cribl default user: admin; password: admin --> changed: CriblAdmin123
-# kibana default user: elastic; password: Sup3rS3cure#2
-# grafana user: admin; password: Sup3rS3cure#2
+# To run this script:
+# docker-compose up -d --scale workers=1 --scale edge=1
+# *********************** CREDS ************************ 
 # keycloak user: keycloakadmin; password: Sup3rS3cure#2
 # minio default user: minioadmin; password: minioadmin
-# minion Access Key: b6XwDnHQ95VB4ypmmNBI; Secret Key: rlWOOE73zcl6vTTZeMVlgT0Hp7HXlyFIrteVwGXO
-# list container ids and names: docker ps --format "table {{.ID}}\t{{.Names}}"
+# cribl default user: admin; password: CriblAdmin123
+# grafana user: admin; password: Sup3rS3cure#2
+# ******************************************************  
 
 services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=keycloakadmin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=Sup3rS3cure#2
+    command: start-dev
+    volumes:
+      - "~/Downloads/cribl-practice/configs/keycloak-data:/opt/keycloak/data"
+    restart: always
+
   minio:
     image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1
     command: server --console-address ":9090" /minio/mnt/data
@@ -26,6 +39,7 @@ services:
     volumes:
       - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
       - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
+
   stream:
     build: .
     user: cribl:cribl
@@ -45,6 +59,7 @@ services:
       - CAP_NET_BIND_SERVICE
       - CAP_DAC_READ_SEARCH
       - CAP_SYS_PTRACE
+
   workers:
     build: .
     user: cribl:cribl
@@ -75,107 +90,20 @@ services:
     ports:
       - "9420"
 
-  edge-amer:
-    build: .
-    user: cribl:cribl
+  prometheus:
+    image: prom/prometheus
+    restart: unless-stopped
+    ports:
+      - '9080:9080'
+    volumes:
+      - "~/Downloads/cribl-practice/configs/prom-data:/etc/prometheus"
+
+  grafana:
+    image: grafana/grafana-oss
     restart: unless-stopped
     depends_on: 
-      - stream
-    environment:
-      - CRIBL_DIST_MODE=managed-edge
-      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=AMER
-      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
+      - prometheus
+    ports:
+      - '3000:3000'
     volumes:
-      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
-    ports:
-      - "9420"
-
-  edge-emea:
-    build: .
-    user: cribl:cribl
-    restart: unless-stopped
-    depends_on: 
-      - stream
-    environment:
-      - CRIBL_DIST_MODE=managed-edge
-      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=EMEA
-      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
-    volumes:
-      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
-    ports:
-      - "9420"
-
-  edge-apac:
-    build: .
-    user: cribl:cribl
-    restart: unless-stopped
-    depends_on: 
-      - stream
-    environment:
-      - CRIBL_DIST_MODE=managed-edge
-      - CRIBL_DIST_MASTER_URL=tcp://criblstream@stream:4200?group=APAC
-      - CRIBL_VOLUME_DIR=/opt/cribl/edge-config
-    volumes:
-      - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
-    ports:
-      - "9420"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
-    environment:
-      - discovery.type=single-node
-      - ELASTIC_PASSWORD=Sup3rS3cure#2
-    volumes:
-      - "~/Downloads/cribl-practice/configs/elastic-config:/opt/elasticsearch/etc/"
-    ports:
-      - "9200:9200"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    restart: always
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.1.2
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    restart: always
-
-## Look in the Kibana logs for http://0.0.0.0:5601/?code=######
-## Should appear after 20 secs
-## On the Elasticsearch container, run: 
-## /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
-## Copy the enrollment key to Kibana 
-## Look in the Kibana logs to get the verification code
-
-#eyJ2ZXIiOiI4LjE0LjAiLCJhZHIiOlsiMTcyLjE4LjAuMjo5MjAwIl0sImZnciI6ImUxMTM5YTRiNTdhMmUyM2U3MWE4YTM1YTMyODM5MDNlMWU3ZDFkOGZmYzM5Y2VlNTJkZGE0YTU3ZTdmYTAyYzIiLCJrZXkiOiJSQ0JyczVnQmQtVzNFMmdxclFqRTpFM2FYb3E5bFB6V2NvdGJTQlpHZFV3In0=
-
-  # grafana:
-  #   image: grafana/grafana-oss
-  #   restart: unless-stopped
-  #   ports:
-  #     - '3000:3000'
-  #   volumes:
-  #     - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"
-
-  # prometheus:
-  #   image: prom/prometheus
-  #   restart: unless-stopped
-  #   ports:
-  #     - '9080:9080'
-  #   volumes:
-  #     - "~/Downloads/cribl-practice/configs/prom-data:/etc/prometheus"
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - KC_BOOTSTRAP_ADMIN_USERNAME=keycloakadmin
-      - KC_BOOTSTRAP_ADMIN_PASSWORD=Sup3rS3cure#2
-    command: start-dev
-    volumes:
-      - "~/Downloads/cribl-practice/configs/keycloak-data:/opt/keycloak/data"
-    restart: always
+      - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"
