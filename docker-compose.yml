@@ -2,7 +2,7 @@
 #                Build Cribl Environment            #
 #####################################################
 # To run this script:
-# docker-compose up -d --scale workers=1 --scale edge=1
+# docker-compose up -d --scale workers=2 --scale edge=2
 # *********************** CREDS ************************ 
 # keycloak user: keycloakadmin; password: Sup3rS3cure#2
 # minio default user: minioadmin; password: minioadmin
