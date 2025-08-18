@@ -1,13 +1,13 @@
 FROM cribl/cribl:latest
 
 # Create a cert
-# RUN cd /etc/ssl/certs/ && openssl req -newkey rsa:4096  -x509  -sha512  -days 365 -nodes -out certificate.pem -keyout privatekey.pem -passout pass:MyS3cUr3PaSsPhRaS3 \
-# -subj "/C=US/ST=California/L=San Francisco/O=Evil Coffee Co/OU=Data Team/CN=localhost" \
-# -addext "subjectAltName = DNS:localhost,DNS:127.0.0.1,DNS:*.localhost,IP:127.0.0.1,IP:::1" && \
-# openssl x509 -in /etc/ssl/certs/certificate.pem -out ~/criblcertificate.crt
+RUN cd /etc/ssl/certs/ && openssl req -newkey rsa:4096  -x509  -sha512  -days 365 -nodes -out certificate.pem -keyout privatekey.pem -passout pass:MyS3cUr3PaSsPhRaS3 \
+-subj "/C=US/ST=California/L=San Francisco/O=Evil Coffee Co/OU=Data Team/CN=localhost" \
+-addext "subjectAltName = DNS:localhost,DNS:127.0.0.1,DNS:*.localhost,IP:127.0.0.1,IP:::1" && \
+openssl x509 -in /etc/ssl/certs/certificate.pem -out ~/criblcertificate.crt
 
 # Add cert
-COPY ./certs/certificate.pem ./certs/privatekey.pem /etc/ssl/certs/
+# COPY ./certs/certificate.pem ./certs/privatekey.pem /etc/ssl/certs/
 
 # Create the 'cribl' group (if it doesn't exist)
 RUN groupadd --gid 999 cribl || true
