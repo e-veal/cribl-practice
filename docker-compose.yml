@@ -4,43 +4,14 @@
 # To run this script:
 # docker-compose up -d --scale workers=2 --scale edge=2
 # *********************** CREDS ************************ 
-# keycloak user: admin; password: admin
 # minio default user: minioadmin; password: minioadmin
 # cribl default user: admin; password: CriblAdmin123
 # grafana user: admin; password: Sup3rS3cure#2
 # certificate passphrase: MyS3cUr3PaSsPhRaS3
+# user credentials: Sup3rS3cretP$wd
 # ******************************************************  
 
 services:
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
-      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
-    command: start-dev
-    volumes:
-      - "~/Downloads/cribl-practice/configs/keycloak-data:/opt/keycloak/data"
-    restart: always
-
-  minio:
-    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1
-    command: server --console-address ":9090" /minio/mnt/data
-    ports:
-      - "9001:9000"
-      - "9090:9090"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://minio:9090/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-    hostname: minio
-    volumes:
-      - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
-      - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
-
   stream:
     build: .
     user: cribl:cribl
@@ -60,6 +31,22 @@ services:
       - CAP_NET_BIND_SERVICE
       - CAP_DAC_READ_SEARCH
       - CAP_SYS_PTRACE
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1
+    command: server --console-address ":9090" /minio/mnt/data
+    ports:
+      - "9001:9000"
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://minio:9090/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    hostname: minio
+    volumes:
+      - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
+      - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
 
   workers:
     build: .
@@ -91,20 +78,3 @@ services:
     ports:
       - "9420"
 
-  prometheus:
-    image: prom/prometheus
-    restart: unless-stopped
-    ports:
-      - '9080:9080'
-    volumes:
-      - "~/Downloads/cribl-practice/configs/prom-data:/etc/prometheus"
-
-  grafana:
-    image: grafana/grafana-oss
-    restart: unless-stopped
-    depends_on: 
-      - prometheus
-    ports:
-      - '3000:3000'
-    volumes:
-      - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"

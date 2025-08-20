@@ -8,4 +8,4 @@ credentials*
 *.key
 *.crt
 configs/
-cribl-config/
+/cribl-config/

@@ -161,14 +161,6 @@ services:
 ## Copy the enrollment key to Kibana 
 ## Look in the Kibana logs to get the verification code
 
-  grafana:
-    image: grafana/grafana-oss
-    restart: unless-stopped
-    ports:
-      - '3000:3000'
-    volumes:
-      - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"
-
   prometheus:
     image: prom/prometheus
     restart: unless-stopped
@@ -176,3 +168,13 @@ services:
       - '9080:9080'
     volumes:
       - "~/Downloads/cribl-practice/configs/prom-data:/etc/prometheus"
+
+  grafana:
+    image: grafana/grafana-oss
+    restart: unless-stopped
+    depends_on: 
+      - prometheus
+    ports:
+      - '3000:3000'
+    volumes:
+      - "~/Downloads/cribl-practice/configs/grafana-data:/var/lib/grafana"
