@@ -7,3 +7,4 @@ credentials*
 *.pem
 *.key
 *.crt
+configs/
