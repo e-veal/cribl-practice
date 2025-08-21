@@ -31,3 +31,5 @@ ENTRYPOINT ["/opt/cribl/bin/cribl", "server"]
 COPY ./sample_logs/crowdstrike_fdr.json ./sample_logs/fortinet.json ./sample_logs/okta.json ./sample_logs/zscalar_nss.json /opt/cribl/data/samples/
 COPY ./sample_logs/proto.csv /opt/cribl/data/lookups/
 COPY ./sample_logs/sample.yml /opt/cribl/local/
+
+# RUN apt-get update && apt-get install -y procps

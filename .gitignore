@@ -7,5 +7,3 @@ credentials*
 *.pem
 *.key
 *.crt
-configs/
-/cribl-config/

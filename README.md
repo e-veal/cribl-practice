@@ -47,8 +47,7 @@ This lab is designed to give you prompts so that you can discover how to execute
    - The public and private key are both located in /etc/ssl on the Stream server. They are named **certificate.pem** and **privatekey.pem**, respectively
 8. Disable API Service on Workers
 9. Ensure you are always on the latest version of Cribl
-10. Create the following notifications
-11. Ensure any node only uses 1 process
+10. Ensure any node only uses 1 process
    > [!IMPORTANT]
    > This is not a recommended practice. This is simply to show how to configure and since we are using a Docker environment we want to limit the number of CPUs that are being used.
 
@@ -97,7 +96,7 @@ This lab is designed to give you prompts so that you can discover how to execute
 
    `docker-compose up -d --build worker --scale worker=2`
 
-2. Create 2 new Worker Groups called `East` and `West`.
+2. Create a Worker Group called `East` 
 
 3. Create 5 different datagens:
    - syslog
@@ -124,11 +123,12 @@ This lab is designed to give you prompts so that you can discover how to execute
 
    | Pipeline | Function                                                                                                                                                                                                                                                                       |
    | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-   | syslog   | Remove `source` and `procid`.<br>Remove `future_use_0`, `future_use_1`, `future_use_2`, `future_use_3`, `future_use_4`, `device_group_hierarchy_level_1`, `device_group_hierarchy_level_2`, `device_group_hierarchy_level_3`, `device_group_hierarchy_level_4`, `tunnel_type`. |
-   | weblog   | Tag data with `index=weblogs`.                                                                                                                                                                                                                                                 |
-   | fortinet | Add `index=weblogs`.<br>Remove `appid`, `dstuuid`, `mastersrcmac`, `poluuid`, `srcuuid`, `utmref`, `date`.<br>Remove events with `multicast` & `vpn`.                                                                                                                          |
+   | syslog   | Remove `source` and `procid`. |
+   | weblog   | Tag data with `index=weblogs`.  <br>Remove `future_use_0`, `future_use_1`, `future_use_2`, `future_use_3`, `future_use_4`, `device_group_hierarchy_level_1`, `device_group_hierarchy_level_2`, `device_group_hierarchy_level_3`, `device_group_hierarchy_level_4`, `tunnel_type`. |
+   | fortinet | Tag data with `index=security`.<br>Remove `appid`, `dstuuid`, `mastersrcmac`, `poluuid`, `srcuuid`, `utmref`, `date`.<br>Remove events with `multicast` & `vpn`.                                                                                                                          |
 
 8. Send data to the appropriate destination.
+9. Create a notification on each destination to send a (Webhook)[https://webhook.site] message that you are experiencing backpressure.
 
 
 ## Other Tasks
@@ -145,6 +145,9 @@ This lab is designed to give you prompts so that you can discover how to execute
 8. Packs
 9. Lookups
 10. Mapping
+11. Future
+    1.  Sample aren't showing
+    2.  Ingest from syslog
 
 ## Help
 Click on the section to get a step-by-step solution.
@@ -201,7 +204,7 @@ Click on the section to get a step-by-step solution.
 
    ### General Settings
    3. **MinIO endpoint URL:** http://minio:9000
-   4. **Backpressure behavior:** Drop
+   4. **Backpressure behavior:** Block
 
    ### Authenication
    5. **Authenication method:** Manual

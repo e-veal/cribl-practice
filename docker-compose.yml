@@ -46,7 +46,7 @@ services:
     hostname: minio
     volumes:
       - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
-      - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
+      # - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
 
   workers:
     build: .
@@ -77,4 +77,3 @@ services:
       - "~/Downloads/cribl-practice/configs/edge-data:/opt/cribl/edge-volume"
     ports:
       - "9420"
-
