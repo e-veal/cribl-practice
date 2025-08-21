@@ -111,11 +111,11 @@ This lab is designed to give you prompts so that you can discover how to execute
 
 5. Create the following subscriptions:
 
-   | Subscription Name | Data                  | Pipeline |
-   | ----------------- | --------------------- | -------- |
-   | syslog_logs       | syslog                | passthru |
-   | web_logs          | weblog                | passthru |
-   | security_logs     | fortinet, crowdstrike | passthru |
+   | Subscription Name | Data                  | 
+   | ----------------- | --------------------- | 
+   | syslog_logs       | syslog                | 
+   | web_logs          | weblog                | 
+   | security_logs     | fortinet, crowdstrike |
 
 6. Create projects for the appropriate teams.
 
