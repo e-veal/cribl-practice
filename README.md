@@ -57,11 +57,9 @@ This lab is designed to give you prompts so that you can discover how to execute
 
    | Name           | Workspace Permissions | Product Permissions                |
    | -------------- | --------------------- | ---------------------------------- |
-   | SOC_Team       | Admin                 | Stream: Admin; Edge: User          |
+   | SOC_Team       | Admin                 | Stream: Admin; Edge: Admin          |
    | ITOps_Team     | User                  | Stream: User; Edge: User           |
    | Marketing_Team | User                  | Stream: Read Only; Edge: No Access |
-   | East_Team      | User                  | Stream: Read Only; Edge: User      |
-   | West_Team      | User                  | Stream: Read Only; Edge: User      |
 
 
 2. Add the following users and add the to the appropriate team 
@@ -71,13 +69,9 @@ This lab is designed to give you prompts so that you can discover how to execute
 | Gertie Goatley    | ggoatley    | ggoatley@evilcoffee.co    | User      | Marketing_Team | Stream: Read Only; Edge: User      |
 | Billy Goatsworth  | bgoatsworth | bgoatsworth@evilcoffee.co | User      | Marketing_Team | Stream: User; Edge: User           |
 | Lex Luthor        | lluthor     | lluthor@evilcoffee.co     | User      | ITOps_Team     | Stream: User; Edge: User           |
-| Jafar Bleatmore   | jbleatmore  | jbleatmore@evilcoffee.co  | User      | ITOps_Team     | Stream: User; Edge: User           |
+| Loki Asgard   | lasgard  | lasgard@evilcoffee.co  | User      | ITOps_Team     | Stream: User; Edge: User           |
 | Thanos Goatkins   | tgoatkins   | tgoatkins@evilcoffee.co   | User      | SOC_Team       | Stream: Admin; Edge: Admin         |
 | Cruella de Vil    | cdevil      | cdevil@evilcoffee.co      | User      | SOC_Team       | Stream: Read Only; Edge: Read Only |
-| Poison Ivy        | pivy        | pivy@evilcoffee.co        | User      | East_Team      | Stream: No Access; Edge: No Access |
-| Venom Woolington  | vwoolington | vwoolington@evilcoffee.co | User      | East_Team      | Stream: User; Edge: User           |
-| Loki Lambkin      | llambkin    | llambkin@evilcoffee.co    | User      | West_Team      | Stream: User; Edge: User           |
-| Ursula Kiddington | ukiddington | ukiddington@evilcoffee.co | User      | West_Team      | Stream: User; Edge: No Access      |
 
 > **Questions**
 >1. Will Venom have access to Edge?
@@ -111,24 +105,26 @@ This lab is designed to give you prompts so that you can discover how to execute
 
 5. Create the following subscriptions:
 
-   | Subscription Name | Data                  | 
-   | ----------------- | --------------------- | 
-   | syslog_logs       | syslog                | 
-   | web_logs          | weblog                | 
-   | security_logs     | fortinet, crowdstrike |
+   | Team      | Subscription Name | Data               |
+   | --------- | ----------------- | ------------------ |
+   | ITOps     | syslog_logs       | syslog             |
+   | Marketing | web_logs          | weblog             |
+   | SOC       | security_logs     | firewall, fortinet |
 
-6. Create projects for the appropriate teams.
+6. Create **Projects** for the appropriate teams.
 
-7. Create pipelines to perform the following functions:
 
-   | Pipeline | Function                                                                                                                                                                                                                                                                       |
+1. Create **Pipelines** to perform the following functions:
+
+   | Logs | Pipeline                                                                                                                                                                                                                                                                       |
    | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-   | syslog   | Remove `source` and `procid`. |
-   | weblog   | Tag data with `index=weblogs`.  <br>Remove `future_use_0`, `future_use_1`, `future_use_2`, `future_use_3`, `future_use_4`, `device_group_hierarchy_level_1`, `device_group_hierarchy_level_2`, `device_group_hierarchy_level_3`, `device_group_hierarchy_level_4`, `tunnel_type`. |
-   | fortinet | Tag data with `index=security`.<br>Remove `appid`, `dstuuid`, `mastersrcmac`, `poluuid`, `srcuuid`, `utmref`, `date`.<br>Remove events with `multicast` & `vpn`.                                                                                                                          |
+   | syslog   | Remove `source` and `procid` |
+   | weblog   | Tag data with `index=weblogs` |
+   | firewall | Remove `future_use_0`, `future_use_1`, `future_use_2`, `future_use_3`, `future_use_4`, `device_group_hierarchy_level_1`, `device_group_hierarchy_level_2`, `device_group_hierarchy_level_3`, `device_group_hierarchy_level_4`, `tunnel_type`<br>Tag data with `index=security` |
+   | fortinet | Remove `appid`, `dstuuid`, `mastersrcmac`, `poluuid`, `srcuuid`, `utmref`, `date`.<br>Remove events with `multicast` & `vpn`<br>Tag data with `index=security`                                                                                                                          |
 
-8. Send data to the appropriate destination.
-9. Create a notification on each destination to send a (Webhook)[https://webhook.site] message that you are experiencing backpressure.
+2. Send data to the appropriate destination.
+3.  Create a notification on each destination to send a [Webhook](https://webhook.site) message that you are experiencing backpressure.
 
 
 ## Other Tasks
@@ -140,7 +136,7 @@ This lab is designed to give you prompts so that you can discover how to execute
 6. HA Leader
 7. PQ
 10. Replay
-11. REST Collectors
+11. ~~REST Collectors~~
 12. Event breakers
 8. Packs
 9. Lookups
