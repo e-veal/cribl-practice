@@ -5,7 +5,7 @@
 # docker-compose up -d --scale workers=2 --scale edge=2
 # *********************** CREDS ************************ 
 # minio default user: minioadmin; password: minioadmin
-# cribl default user: admin; password: CriblAdmin123
+# cribl default user: admin; password: admin
 # grafana user: admin; password: Sup3rS3cure#2
 # certificate passphrase: MyS3cUr3PaSsPhRaS3
 # user credentials: Sup3rS3cretP$wd
