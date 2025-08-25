@@ -9,3 +9,4 @@ credentials*
 *.crt
 configs/
 /cribl-config/
+/sample_logs/
