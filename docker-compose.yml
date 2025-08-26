@@ -5,7 +5,7 @@
 # docker-compose up -d --scale workers=2 --scale edge=2
 # *********************** CREDS ************************ 
 # minio default user: minioadmin; password: minioadmin
-# cribl default user: admin; password: CriblAdmin123
+# cribl default user: admin; password: admin
 # grafana user: admin; password: Sup3rS3cure#2
 # certificate passphrase: MyS3cUr3PaSsPhRaS3
 # user credentials: Sup3rS3cretP$wd
@@ -17,8 +17,11 @@ services:
     user: cribl:cribl
     restart: unless-stopped
     environment:
+<<<<<<< HEAD
       # - CRIBL_DIST_MODE=master
       # - CRIBL_DIST_MASTER_URL=tcp://criblstream@0.0.0.0:4200
+=======
+>>>>>>> 1e6e8046f68985c82eed177be01f47ce4cc19818
       - CRIBL_VOLUME_DIR=/opt/cribl/config-volume
       - VIRTUAL_PROTO=https
       - VIRTUAL_PORT=443
@@ -46,7 +49,6 @@ services:
     hostname: minio
     volumes:
       - "~/Downloads/cribl-practice/configs/minio-data:/minio/mnt/data"
-      # - "~/Downloads/cribl-practice/configs/minio-config:/minio/etc/config.env"
 
   workers:
     build: .

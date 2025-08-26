@@ -136,7 +136,7 @@ This lab is designed to give you prompts so that you can discover how to execute
 6. HA Leader
 7. PQ
 10. Replay
-11. REST Collectors
+11. ~~REST Collectors~~
 12. Event breakers
 8. Packs
 9. Lookups
