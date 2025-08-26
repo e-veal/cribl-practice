@@ -6,6 +6,10 @@ RUN cd /etc/ssl/certs/ && openssl req -newkey rsa:4096  -x509  -sha512  -days 36
 -addext "subjectAltName = DNS:localhost,DNS:127.0.0.1,DNS:*.localhost,IP:127.0.0.1,IP:::1" && \
 openssl x509 -in /etc/ssl/certs/certificate.pem -out ~/criblcertificate.crt
 
+# Add cert
+# COPY ./certs/certificate.pem ./certs/privatekey.pem ./certs/criblcertificate.crt /etc/ssl/certs/
+# COPY ./certs/criblcertificate.crt /root/
+
 # Create the 'cribl' group (if it doesn't exist)
 RUN groupadd --gid 999 cribl || true
 
