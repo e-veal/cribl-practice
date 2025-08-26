@@ -17,8 +17,8 @@ services:
     user: cribl:cribl
     restart: unless-stopped
     environment:
-      - CRIBL_DIST_MODE=master
-      - CRIBL_DIST_MASTER_URL=tcp://criblstream@0.0.0.0:4200
+      # - CRIBL_DIST_MODE=master
+      # - CRIBL_DIST_MASTER_URL=tcp://criblstream@0.0.0.0:4200
       - CRIBL_VOLUME_DIR=/opt/cribl/config-volume
       - VIRTUAL_PROTO=https
       - VIRTUAL_PORT=443
